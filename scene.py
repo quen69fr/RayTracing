@@ -274,8 +274,8 @@ class Scene:
             dot_prod_viwer_n = nx * rx + ny * ry + nz * rz
             if isinstance(closest_obj, LightSource):
                 # I'm not sure if it is accurate physically, but it looks ok ...
-                # coef = -dot_prod_viwer_n / (best_dist ** 2)
-                coef = -dot_prod_viwer_n
+                coef = -dot_prod_viwer_n / (best_dist ** 2)
+                # coef = -dot_prod_viwer_n
                 return (coef * closest_obj.color_intensity[0],
                         coef * closest_obj.color_intensity[1],
                         coef * closest_obj.color_intensity[2])
@@ -326,11 +326,13 @@ class Scene:
 
                 # Looking for every object if it hide the light to the surface
                 for obj in self.objects:
-                    if obj == closest_obj or obj == object_to_avoid:
-                        # Here the object can't be in front of himself
-                        # This is NOT accurate : if the viewer is inside a sphere for instance
-                        continue
+                    # if obj == closest_obj or obj == object_to_avoid:
+                    #     # Here the object can't be in front of himself
+                    #     # This is NOT accurate : if the viewer is inside a sphere for instance
+                    #     continue
                     if isinstance(obj, Sphere):
+                        if obj.r == 0:
+                            continue
                         dx = obj.x - ix
                         dy = obj.y - iy
                         dz = obj.z - iz
@@ -349,7 +351,29 @@ class Scene:
                                 is_visible = False
                                 break
                     elif isinstance(obj, Plan):
-                        pass  # TODO
+                        d = obj.a * sx + obj.b * sy + obj.c * sz
+                        # Is the plan parallel to the line between the light and the intersection
+                        if d != 0:
+                            t = obj.a * ix + obj.b * iy + obj.c * iz + obj.d
+                            # Is this object on the right side of the intersection and
+                            # inbetween the light and the intersection
+                            if (0 < t < d) or (d < t < 0):
+                                t /= d
+                                if dist_min_vision < t:
+                                    is_inside = True
+                                    if isinstance(obj, Rectangle):
+                                        # Intersection point with the plan
+                                        i2x = ix - sx * t
+                                        i2y = iy - sy * t
+                                        i2z = iz - sz * t
+                                        # Check if the point is inside the rectangle
+                                        for p, v in zip(obj.points, obj.vectors):
+                                            if (i2x - p[0]) * v[0] + (i2y - p[1]) * v[1] + (i2z - p[2]) * v[2] < 0:
+                                                is_inside = False
+                                                break
+                                    if is_inside:
+                                        is_visible = False
+                                        break
 
                 # Is the light reaches directely the surface of the object
                 if is_visible:
