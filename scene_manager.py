@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from random import random, seed
 from math import pi, cos, sin
 import numpy
 from PIL import Image
@@ -105,13 +106,12 @@ class SceneManager:
 
         # Snowman scene :
         elif self.id_scene == 4:
+            seed(10)
             self.scene = Scene(0.03, ambient_color=(0.2, 0.2, 0.2), background_color=(0.5, 0.8, 1))
             self.viewer = Viewer(self.scene, 1920, 1080, 960, -300, -5000)
-            self.scene.add_object(Rectangle((156, 0, 0), (0, 0, 156), (-600, 1500, 1500), 20, 20,
-                                            mirror_reflection=0.05, glossiness=0.15,
-                                            texture=load_image("Textures/RedChessBoard.png")))
-            self.scene.add_source(LightSource(-200000, -100000, -1000000, 10 ** 12, radius_source=100))
-            self.num_frames = 2 * 6 * 60
+            self.scene.add_source(LightSource(-200000, -100000, -1000000, 5 * 10 ** 11, radius_source=100))
+            self.scene.add_source(LightSource(-100000, -200000, -1000000, 5 * 10 ** 11, radius_source=100))
+            self.num_frames = 3 * 6 * 60 - 40
 
         # Chess reflection scene :
         elif self.id_scene == 5:
@@ -134,47 +134,66 @@ class SceneManager:
             return
         if self.id_scene == 0:
             self.scene.rotate_y(500, 1700, -2 * pi * jump / self.num_frames)
+
         elif self.id_scene == 1:
             for j in range(self.params[0]):
                 self.scene.objects[j].rotate_y(500, 1700, 2 * jump * pi / self.num_frames)
                 self.scene.objects[j].y = 200 + 200 * cos(4 * pi * (j / self.params[0] - jump * t / self.num_frames))
+
         elif self.id_scene == 4:
             for t2 in range(t - jump + 1, t + 1):
-                self.scene.rotate_y(960, 3060, -4 * pi / self.num_frames)
+                self.scene.rotate_y(960, 3060, -2 * pi / 360)
                 if t2 <= 1 * 60:
-                    self.scene.objects[0] = Rectangle((156, 0, 0), (0, 0, 156), (-600, 1500, 1500), 20, 20 * t2 / 60,
-                                                      mirror_reflection=0.05, glossiness=0.15,
-                                                      texture=load_image("Textures/RedChessBoard.png"))
-                    self.scene.objects[0].rotate_y(960, 3060, -4 * pi * t2 / self.num_frames)
+                    if t2 == 1:
+                        # Floor : -1
+                        self.scene.add_object(Rectangle((156, 0, 0), (0, 0, 156), (-600, 1500, 1500), 20, 20,
+                                                        mirror_reflection=0.05, glossiness=0.15,
+                                                        texture=load_image("Textures/RedChessBoard.png")))
+                    self.scene.objects[-1] = Rectangle((156, 0, 0), (0, 0, 156), (-600, 1500, 1500), 20, 20 * t2 / 60,
+                                                       mirror_reflection=0.05, glossiness=0.15,
+                                                       texture=load_image("Textures/RedChessBoard.png"))
+                    self.scene.objects[-1].rotate_y(960, 3060, -2 * pi * t2 / 360)
+
                 elif t2 <= 2 * 60:
                     if t2 == 60 + 30:
                         c = (0.9, 0.7, 0.2)
-                        self.scene.add_object(Rectangle((1, 0, 0), (0, 0, 1), (-200, 1100, 3500), 400, 400, color=c))
-                        self.scene.add_object(Rectangle((1, 0, 0), (0, 1, 0), (-200, 1100, 3500), 400, 400, color=c))
+                        # Cube = -5, -4, -3, -2, -1
+                        self.scene.add_object(Rectangle((1, 0, 0), (0, 0, 1), (-200, 1100, 3500), 400, 400,
+                                                        color=c))
+                        self.scene.add_object(Rectangle((1, 0, 0), (0, 1, 0), (-200, 1100, 3500), 400, 400,
+                                                        color=c))
                         self.scene.add_object(Rectangle((1, 0, 0), (0, 1, 0), (-200, 1100, 3500 + 400), 400, 400,
                                                         color=c))
-                        self.scene.add_object(Rectangle((0, 1, 0), (0, 0, 1), (-200, 1100, 3500), 400, 400, color=c))
+                        self.scene.add_object(Rectangle((0, 1, 0), (0, 0, 1), (-200, 1100, 3500), 400, 400,
+                                                        color=c))
                         self.scene.add_object(Rectangle((0, 1, 0), (0, 0, 1), (-200 + 400, 1100, 3500), 400, 400,
                                                         color=c))
                         for i in range(1, 6):
-                            self.scene.objects[-i].rotate_y(960, 3060, -4 * pi * t2 / self.num_frames)
+                            self.scene.objects[-i].rotate_y(960, 3060, -2 * pi * t2 / 360)
                 elif t2 <= 3 * 60:
                     if t2 == 2 * 60 + 1:
+                        # Mirror sphere : -1
                         self.scene.add_object(SphereObject(1800, 850, 2500, 0, mirror_reflection=0.9))
-                        self.scene.objects[-1].rotate_y(960, 3060, -4 * pi * t2 / self.num_frames)
+                        self.scene.objects[-1].rotate_y(960, 3060, -2 * pi * t2 / 360)
                     self.scene.objects[-1].r = 250 * (t2 - 2 * 60) / 60
-                elif t2 <= 6 * 60:
+                elif t2 <= 6 * 60 + 30:
                     if t2 == 3 * 60 + 1:
+                        # Body : -6, -5
                         self.scene.add_object(SphereObject(960, 1300, 3060, 400, mirror_reflection=0.05))
                         self.scene.add_object(SphereObject(960, 800, 3060, 300, mirror_reflection=0.05))
+                        # Head : -4
                         self.scene.add_object(SphereObject(960, 420, 3060, 210, mirror_reflection=0.05))
 
+                        # Nose : -3
                         self.scene.add_object(SphereObject(960, 420, 3060 - 215, 25, color=(0.8, 0.3, 0.1),
                                                            mirror_reflection=0.2))
-                        self.scene.add_object(SphereObject(960 + 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200, 20,
-                                                           color=(0, 0, 0), mirror_reflection=0.1, glossiness=0.8))
-                        self.scene.add_object(SphereObject(960 - 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200, 20,
-                                                           color=(0, 0, 0), mirror_reflection=0.1, glossiness=0.8))
+                        # Eyes : -2, -1
+                        self.scene.add_object(SphereObject(960 + 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200,
+                                                           20, color=(0, 0, 0), mirror_reflection=0.1,
+                                                           glossiness=0.8))
+                        self.scene.add_object(SphereObject(960 - 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200,
+                                                           20, color=(0, 0, 0), mirror_reflection=0.1,
+                                                           glossiness=0.8))
 
                         self.scene.objects[-6].y -= 1 * 1500
                         self.scene.objects[-5].y -= 2 * 1500
@@ -184,18 +203,37 @@ class SceneManager:
                         self.scene.objects[-6].y += 25
                     if t2 <= 5 * 60:
                         self.scene.objects[-5].y += 25
-                    self.scene.objects[-4].y += 25
+                    if t2 <= 6 * 60:
+                        self.scene.objects[-4].y += 25
 
-                    dz = 3 * 1500 - (t2 - 3 * 60) * 25
+                    dz = 3 * 1500 + 750 - (t2 - 3 * 60) * 25
 
                     self.scene.objects[-3] = SphereObject(960, 420, 3060 - 215 - dz, 25, color=(0.8, 0.3, 0.1),
                                                           mirror_reflection=0.2)
-                    self.scene.objects[-2] = SphereObject(960 - 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200 - dz,
-                                                          20, color=(0, 0, 0), mirror_reflection=0.1, glossiness=0.8)
-                    self.scene.objects[-1] = SphereObject(960 + 75, 420 - sin(0.3) * 200, 3060 - cos(0.3) * 200 - dz,
-                                                          20, color=(0, 0, 0), mirror_reflection=0.1, glossiness=0.8)
+                    self.scene.objects[-2] = SphereObject(960 - 75, 420 - sin(0.3) * 200,
+                                                          3060 - cos(0.3) * 200 - dz, 20, color=(0, 0, 0),
+                                                          mirror_reflection=0.1, glossiness=0.8)
+                    self.scene.objects[-1] = SphereObject(960 + 75, 420 - sin(0.3) * 200,
+                                                          3060 - cos(0.3) * 200 - dz, 20, color=(0, 0, 0),
+                                                          mirror_reflection=0.1, glossiness=0.8)
                     for i in range(1, 4):
-                        self.scene.objects[-i].rotate_y(960, 3060, -4 * pi * t2 / self.num_frames)
+                        self.scene.objects[-i].rotate_y(960, 3060, -2 * pi * t2 / 360)
+                elif t2 > 10 * 60:
+                    num_flakes = 150
+                    if t2 == 10 * 60 + 1:
+                        for i in range(num_flakes):
+                            self.scene.add_object(SphereObject(-600 + 3120 * random(), -random() * 1500,
+                                                               1500 + 3120 * random(), 5 + 10 * random(),
+                                                               mirror_reflection=0.05))
+                            self.scene.objects[-1].rotate_y(960, 3060, -2 * pi * t2 / 360)
+
+                    for i in range(1, num_flakes + 1):
+                        self.scene.objects[-i].y += 2.5 + random() * 6
+                        if self.scene.objects[-i].y > self.scene.objects[-i].r + 1500:
+                            self.scene.objects[-i].x = -600 + 3120 * random()
+                            self.scene.objects[-i].y -= 1500
+                            self.scene.objects[-i].z = 1500 + 3120 * random()
+                            self.scene.objects[-i].rotate_y(960, 3060, -2 * pi * t2 / 360)
 
     # ---------------------------------------------------------------------------------------------------------
 

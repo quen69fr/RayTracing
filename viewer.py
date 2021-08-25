@@ -40,7 +40,7 @@ class Viewer:
             x = i % self.width
             y = (i - x) // self.width
             if i % mod == val:
-                if store_directions_viewer_in_memory:
+                if Viewer.store_directions_in_memory:
                     direction = self.directions[y][x]
                 else:
                     direction = self.calcul_direction(x, y)
