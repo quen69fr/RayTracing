@@ -106,7 +106,6 @@ class SceneManager:
 
         # Snowman scene :
         elif self.id_scene == 4:
-            seed(10)
             self.scene = Scene(0.03, ambient_color=(0.2, 0.2, 0.2), background_color=(0.5, 0.8, 1))
             self.viewer = Viewer(self.scene, 1920, 1080, 960, -300, -5000)
             self.scene.add_source(LightSource(-200000, -100000, -1000000, 5 * 10 ** 11, radius_source=100))
@@ -153,7 +152,6 @@ class SceneManager:
                                                        mirror_reflection=0.05, glossiness=0.15,
                                                        texture=load_image("Textures/RedChessBoard.png"))
                     self.scene.objects[-1].rotate_y(960, 3060, -2 * pi * t2 / 360)
-
                 elif t2 <= 2 * 60:
                     if t2 == 60 + 30:
                         c = (0.9, 0.7, 0.2)
@@ -221,6 +219,7 @@ class SceneManager:
                 elif t2 > 10 * 60:
                     num_flakes = 150
                     if t2 == 10 * 60 + 1:
+                        seed(10)
                         for i in range(num_flakes):
                             self.scene.add_object(SphereObject(-600 + 3120 * random(), -random() * 1500,
                                                                1500 + 3120 * random(), 5 + 10 * random(),
@@ -228,12 +227,13 @@ class SceneManager:
                             self.scene.objects[-1].rotate_y(960, 3060, -2 * pi * t2 / 360)
 
                     for i in range(1, num_flakes + 1):
-                        self.scene.objects[-i].y += 2.5 + random() * 6
-                        if self.scene.objects[-i].y > self.scene.objects[-i].r + 1500:
-                            self.scene.objects[-i].x = -600 + 3120 * random()
-                            self.scene.objects[-i].y -= 1500
-                            self.scene.objects[-i].z = 1500 + 3120 * random()
-                            self.scene.objects[-i].rotate_y(960, 3060, -2 * pi * t2 / 360)
+                        flake = self.scene.objects[-i]
+                        flake.y += 2.5 + random() * 6
+                        if flake.y > 1500 + flake.r:
+                            flake.x = -600 + 3120 * random()
+                            flake.y -= 1500
+                            flake.z = 1500 + 3120 * random()
+                            flake.rotate_y(960, 3060, -2 * pi * t2 / 360)
 
     # ---------------------------------------------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ class SceneManager:
         if log:
             print(f"Image saved : {images_saved_path}")
 
-    def create_images(self, mod=1, val=0, multiprocessing: bool = False, num_cpu: int = 1,
+    def create_images(self, t0: int = 0, mod: int = 1, val: int = 0, multiprocessing: bool = False, num_cpu: int = 1,
                       images_saved_path: str = "Frames/Image_#.png", store_directions_viewer_in_memory: bool = True,
                       log: bool = True):
         if store_directions_viewer_in_memory:
@@ -265,24 +265,26 @@ class SceneManager:
         for t in (tqdm(range(self.num_frames)) if log else range(self.num_frames)):
             if t % mod == val:
                 self.update_scene(t, min(t, mod))
-                self.create_image(t, multiprocessing=multiprocessing, num_cpu=num_cpu,
-                                  images_saved_path=images_saved_path, log=False)
+                if t >= t0:
+                    self.create_image(t, multiprocessing=multiprocessing, num_cpu=num_cpu,
+                                      images_saved_path=images_saved_path, log=False)
         if store_directions_viewer_in_memory:
             self.viewer.clear_directions()
 
-    def create_video(self, multiprocessing: bool = False, num_cpu: int = 1, multiprocessing_images: bool = False,
-                     video_path: str = "Video.mp4", num_revolutions_video: int = 1, fps: int = 30,
-                     gif_path: str = None, images_saved_path: str = "Frames/Image_#.png",
-                     store_directions_viewer_in_memory: bool = True, log: bool = True):
+    def create_video(self, t0: int = 0, multiprocessing: bool = False, num_cpu: int = 1,
+                     multiprocessing_images: bool = False, video_path: str = "Video.mp4",
+                     num_revolutions_video: int = 1, fps: int = 30, gif_path: str = None,
+                     images_saved_path: str = "Frames/Image_#.png", store_directions_viewer_in_memory: bool = True,
+                     log: bool = True):
         if log:
             print("Saving images for video")
         if multiprocessing:
             with Pool() as pool:
-                pool.starmap(SceneManager.create_images, [(self, num_cpu, i, False, 1, images_saved_path,
+                pool.starmap(SceneManager.create_images, [(self, t0, num_cpu, i, False, 1, images_saved_path,
                                                            store_directions_viewer_in_memory, log)
                                                           for i in range(num_cpu)])
         else:
-            self.create_images(multiprocessing=multiprocessing_images, num_cpu=num_cpu,
+            self.create_images(t0=t0, multiprocessing=multiprocessing_images, num_cpu=num_cpu,
                                store_directions_viewer_in_memory=store_directions_viewer_in_memory, log=log)
         if log:
             print("=> Images saved")

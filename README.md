@@ -65,7 +65,7 @@ The scene is then ready to be drawn !
 
 In the small main.py, after creating a `SceneManager` instance with the desire scene id.
 * To compute a single image : Use the `create_image` function of your instance. Here are the parameters :
-  * `t: int = 0` The frame's number of te scene you want to draw.
+  * `t: int = 0` The frame's number of the scene you want to draw.
   * `multiprocessing: bool = False` If you want to parallelize the image's computation (to go faster). 
   * `num_cpu: int = 1` In case of `multiprocessing`, the number of processur you want to use.
 Don't use more CPU than the number available on your machine.
@@ -74,6 +74,7 @@ Don't use more CPU than the number available on your machine.
   * `log: bool = True` If you want a progress bar to see the advancement of the image's computation.
 
 * To compute a video : Use the `create_video` function of your instance. Here are the parameters :
+  * `t0: int = 0` The frame's number when you want the scene to start.
   * `multiprocessing: bool = False` If you want to parallelize the images' computation (to go faster).
   * `num_cpu: int = 1`In case of `multiprocessing`, the number of processur you want to use.
 Don't use more CPU than the number available on your machine.

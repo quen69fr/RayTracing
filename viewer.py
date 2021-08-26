@@ -19,6 +19,7 @@ class Viewer:
         self.directions = []
 
     def init_directions(self):
+        self.directions = [[(0.0, 0.0, 0.0) for _ in range(self.width)] for _ in range(self.height)]
         for x in range(self.width):
             for y in range(self.height):
                 self.directions[y][x] = self.calcul_direction(x, y)
