@@ -271,7 +271,7 @@ class SceneManager:
             self.viewer.clear_directions()
 
     def create_video(self, multiprocessing: bool = False, num_cpu: int = 1, multiprocessing_images: bool = False,
-                     video_path: str = "Video.mp4", num_revolutions_video: int = 2, fps: int = 30,
+                     video_path: str = "Video.mp4", num_revolutions_video: int = 1, fps: int = 30,
                      gif_path: str = None, images_saved_path: str = "Frames/Image_#.png",
                      store_directions_viewer_in_memory: bool = True, log: bool = True):
         if log:
