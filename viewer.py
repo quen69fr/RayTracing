@@ -8,7 +8,6 @@ from scene import Scene
 
 
 class Viewer:
-    store_directions_in_memory = False
 
     def __init__(self, scene: Scene, width: int, height: int, x: float, y: float, z: float):
         self.scene = scene
@@ -18,14 +17,14 @@ class Viewer:
         self.width = width
         self.height = height
         self.directions = []
-        if Viewer.store_directions_in_memory:
-            self.directions = [[(0.0, 0.0, 0.0) for _ in range(self.width)] for _ in range(self.height)]
-            self.init_directions()
 
     def init_directions(self):
         for x in range(self.width):
             for y in range(self.height):
                 self.directions[y][x] = self.calcul_direction(x, y)
+
+    def clear_directions(self):
+        del self.directions[:]
 
     def calcul_direction(self, x: int, y: int):
         rx = x - self.x
@@ -40,11 +39,12 @@ class Viewer:
             x = i % self.width
             y = (i - x) // self.width
             if i % mod == val:
-                if Viewer.store_directions_in_memory:
+                if len(self.directions) > 0:
                     direction = self.directions[y][x]
                 else:
                     direction = self.calcul_direction(x, y)
-                color = self.scene.calcul_ray_intensity(self.x, self.y, self.z, *direction)
+                # color = self.scene.calcul_ray_intensity(self.x, self.y, self.z, *direction)
+                color = self.scene.calcul_ray_intensity(x, y, 0, *direction)
                 colors[y][x][0] = 255 * max(min(color[0], 1), 0)
                 colors[y][x][1] = 255 * max(min(color[1], 1), 0)
                 colors[y][x][2] = 255 * max(min(color[2], 1), 0)

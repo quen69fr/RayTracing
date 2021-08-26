@@ -115,7 +115,7 @@ class SceneManager:
 
         # Chess reflection scene :
         elif self.id_scene == 5:
-            self.scene = Scene(0.03, ambient_color=(0.1, 0.1, 0.1))
+            self.scene = Scene(0.03, ambient_color=(0.2, 0.2, 0.2))
             self.viewer = Viewer(self.scene, 1920, 1080, 960, 200, -1000)
             self.scene.add_object(SphereObject(-40, 680, 1300, 450, color=(1, 0, 0), mirror_reflection=0.8))
             self.scene.add_object(SphereObject(960, 680, 1300, 450, color=(0, 1, 0), mirror_reflection=0.8))
@@ -245,7 +245,8 @@ class SceneManager:
         #     self.update_scene(t, t)
         if multiprocessing:
             with Pool() as pool:
-                res = pool.starmap(Viewer.trace_rays, [(self.viewer, num_cpu, i, log) for i in range(num_cpu)])
+                res = pool.starmap(Viewer.trace_rays, [(self.viewer, num_cpu * preview_mod, i * preview_mod, log)
+                                                       for i in range(num_cpu)])
             pixels = sum(res)
         else:
             pixels = self.viewer.trace_rays(mod=preview_mod, log=log)
@@ -257,24 +258,32 @@ class SceneManager:
             print(f"Image saved : {images_saved_path}")
 
     def create_images(self, mod=1, val=0, multiprocessing: bool = False, num_cpu: int = 1,
-                      images_saved_path: str = "Frames/Image_#.png", log=True):
+                      images_saved_path: str = "Frames/Image_#.png", store_directions_viewer_in_memory: bool = True,
+                      log: bool = True):
+        if store_directions_viewer_in_memory:
+            self.viewer.init_directions()
         for t in (tqdm(range(self.num_frames)) if log else range(self.num_frames)):
             if t % mod == val:
                 self.update_scene(t, min(t, mod))
                 self.create_image(t, multiprocessing=multiprocessing, num_cpu=num_cpu,
                                   images_saved_path=images_saved_path, log=False)
+        if store_directions_viewer_in_memory:
+            self.viewer.clear_directions()
 
     def create_video(self, multiprocessing: bool = False, num_cpu: int = 1, multiprocessing_images: bool = False,
                      video_path: str = "Video.mp4", num_revolutions_video: int = 2, fps: int = 30,
-                     gif_path: str = None, images_saved_path: str = "Frames/Image_#.png", log: bool = True):
+                     gif_path: str = None, images_saved_path: str = "Frames/Image_#.png",
+                     store_directions_viewer_in_memory: bool = True, log: bool = True):
         if log:
             print("Saving images for video")
         if multiprocessing:
             with Pool() as pool:
-                pool.starmap(SceneManager.create_images, [(self, num_cpu, i, False, 1, images_saved_path, log)
+                pool.starmap(SceneManager.create_images, [(self, num_cpu, i, False, 1, images_saved_path,
+                                                           store_directions_viewer_in_memory, log)
                                                           for i in range(num_cpu)])
         else:
-            self.create_images(multiprocessing=multiprocessing_images, num_cpu=num_cpu, log=log)
+            self.create_images(multiprocessing=multiprocessing_images, num_cpu=num_cpu,
+                               store_directions_viewer_in_memory=store_directions_viewer_in_memory, log=log)
         if log:
             print("=> Images saved")
 
