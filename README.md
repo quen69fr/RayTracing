@@ -53,8 +53,8 @@ mirror effets..._
    * And settle some video features (the number total of frames, the `params` attribute in order to pass information
 for the next frames...)
 3. Use the `update` function from `SceneManager` to make your scene evolves frame by frame
-   * You then have access to __t__ (the frame's number) and 
-__step__ (__t - step__ being the frame's number the scene's state is when the function is called)
+   * You then have access to `t` (the frame's number) and 
+`step` (`t - step` being the frame's number the scene's state is when the function is called)
    * Rotate the scene (or some specific lights or objects) around the y-axis
    * Directly modify some object/light parameters
    * Add and delete objects and lights
@@ -113,7 +113,7 @@ Ideas:
 shape intersections...)
 * Add texture for : the shapes (delimit the edges), the glossiness and the mirror reflection (gray scale)...
 * Add waves length instead of RGB colors
-* Translucent surface : Diffusion, refraction... (in the calcul_ray_intensity function, the boolean inverse_normal
-directly says from which to which materials the light ray goes)
+* Translucent surface : Diffusion, refraction... (in the `calcul_ray_intensity` function, the boolean `inverse_normal`
+directly says from which to which material the light ray goes)
 * Load STL files
 * Put all the scene configuration and animation (from the `SceneManager` class) in separate files (json?)
