@@ -37,9 +37,9 @@ python3 -m pip install -r requirements.txt
 ## Usage
 
 1. [Create/Edit scene in scene_manager.py](#Create a new scene)
-2. [Edit cpu/ressources in small main.py](#Create images and videos)
+2. [Edit cpu/resources in small main.py](#Create images and videos)
 3. Launch : python3 main.py
-The computation is quite slow, don't be suprices if it takes a few minutes to produce a video...
+The computation is quite slow, don't be surprised if it takes a few minutes to produce a video...
 
 ### Create a new scene
 
@@ -48,8 +48,8 @@ The computation is quite slow, don't be suprices if it takes a few minutes to pr
    * Create a `Viewer` _with a position relative to the screen (z=0)_
    * Create a `Scene` _with ambient colors, background colors, mirror depths (intensity)..._
    * Add __objects__ in the scene (`Sphere`, `Plane`, `Recangles`) _with positions, colors, glossiness,
-mirror effets..._
-   * Add __sources__ in the scene (`LightSource`) _with positions, intensities, colors, radiuses..._
+mirror effects..._
+   * Add __sources__ in the scene (`LightSource`) _with positions, intensities, colors, radius's..._
    * And settle some video features (the number total of frames, the `params` attribute in order to pass information
 for the next frames...)
 3. Use the `update` function from `SceneManager` to make your scene evolves frame by frame
@@ -67,7 +67,7 @@ In the small main.py, after creating a `SceneManager` instance with the desire s
 * To compute a single image : Use the `create_image` function of your instance. Here are the parameters :
   * `t: int = 0` The frame's number of the scene you want to draw.
   * `multiprocessing: bool = False` If you want to parallelize the image's computation (to go faster). 
-  * `num_cpu: int = 1` In case of `multiprocessing`, the number of processur you want to use.
+  * `num_cpu: int = 1` In case of `multiprocessing`, the number of processor you want to use.
 Don't use more CPU than the number available on your machine.
   * `preview_mod: int = 1` To compute only 1 pixel over `preview_mod` just to have a preview.
   * `images_saved_path: str = "Image.png"` The path where you want to save te resulting image.
@@ -76,7 +76,7 @@ Don't use more CPU than the number available on your machine.
 * To compute a video : Use the `create_video` function of your instance. Here are the parameters :
   * `t0: int = 0` The frame's number when you want the scene to start.
   * `multiprocessing: bool = False` If you want to parallelize the images' computation (to go faster).
-  * `num_cpu: int = 1`In case of `multiprocessing`, the number of processur you want to use.
+  * `num_cpu: int = 1`In case of `multiprocessing`, the number of processor you want to use.
 Don't use more CPU than the number available on your machine.
   * `multiprocessing_images: bool = False`In case of `not multiprocessing`, if you to parallelize each image's 
 computation individually.
@@ -108,12 +108,11 @@ or to create and share other mindful and beautiful scenes...
 
 Ideas:
 * Texture for spheres
-* Other shapes/objects : triangles, polygones (convex...), disk...
+* Other shapes/objects : triangles, polygons (convex...), disk...
 * Bounding shapes (avoid testing the intersections on the other side of the scene or to avoid same complicated calcul 
 shape intersections...)
 * Add texture for : the shapes (delimit the edges), the glossiness and the mirror reflection (gray scale)...
 * Add waves length instead of RGB colors
-* Translucent surface : Diffusion, refraction... (in the `calcul_ray_intensity` function, the boolean `inverse_normal`
-directly says from which to which material the light ray goes)
+* Diffusion (in the `calcul_ray_intensity`)
 * Load STL files
 * Put all the scene configuration and animation (from the `SceneManager` class) in separate files (json?)
